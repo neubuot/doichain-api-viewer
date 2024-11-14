@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doichain Explorer API Viewer</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; padding: 0; background-color: #f4f4f9; }
+        h1 { color: #333; }
+        .endpoint { margin-top: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #fff; }
+        label { display: block; margin: 8px 0 4px; }
+        input, button { padding: 8px; margin-right: 5px; }
+        .output { margin-top: 10px; padding: 10px; background-color: #e9e9f0; border-radius: 5px; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Doichain API Explorer</h1>
+    <p>Hier können Sie alle verfügbaren Daten der Doichain API durchsuchen und Parameter eingeben, um spezifische Daten anzufordern.</p>
+
+    <!-- Container für API-Endpunkte -->
+    <div id="api-container">
+        <!-- Beispiel für einen API-Endpunkt -->
+        <div class="endpoint" id="getblock">
+            <h2>getblock</h2>
+            <p>Gibt Informationen zu einem bestimmten Block basierend auf dem Blockhash zurück.</p>
+            <label for="blockhash">Blockhash:</label>
+            <input type="text" id="blockhash" placeholder="z.B. 00000000hash">
+            <button onclick="fetchData('getblock', {blockhash: document.getElementById('blockhash').value || 'default_hash'})">Daten abrufen</button>
+            <div id="output-getblock" class="output"></div>
+        </div>
+
+        <div class="endpoint" id="gettransaction">
+            <h2>gettransaction</h2>
+            <p>Ruft Informationen zu einer bestimmten Transaktion basierend auf der Transaktions-ID ab.</p>
+            <label for="txid">Transaktions-ID:</label>
+            <input type="text" id="txid" placeholder="z.B. txid123">
+            <button onclick="fetchData('gettransaction', {txid: document.getElementById('txid').value || 'default_txid'})">Daten abrufen</button>
+            <div id="output-gettransaction" class="output"></div>
+        </div>
+
+        <!-- Mehr API-Endpunkte können nach diesem Schema hinzugefügt werden -->
+    </div>
+
+    <script>
+        // Basis-URL der API
+        const apiUrl = 'https://explorer.doichain.org/api/';
+
+        // Funktion zum Abrufen von Daten
+        async function fetchData(endpoint, params) {
+            try {
+                // URL mit Parametern erstellen
+                let url = new URL(`${apiUrl}${endpoint}`);
+                Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+
+                // Daten abrufen
+                const response = await fetch(url);
+                const data = await response.json();
+
+                // Ausgabe im entsprechenden div-Container anzeigen
+                document.getElementById(`output-${endpoint}`).innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                document.getElementById(`output-${endpoint}`).innerHTML = `<p class="error">Fehler beim Abrufen der Daten: ${error}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
